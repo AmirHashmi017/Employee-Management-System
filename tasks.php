@@ -2,8 +2,11 @@
 require_once 'config.php';
 requireLogin();
 
-// Fetch all employees
-$sql = "SELECT * FROM employees ORDER BY id DESC";
+// Fetch all tasks with employee names
+$sql = "SELECT t.*, e.name as employee_name 
+        FROM tasks t 
+        LEFT JOIN employees e ON t.employee_id = e.id 
+        ORDER BY t.id DESC";
 $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
@@ -11,7 +14,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees - Employee Management</title>
+    <title>Tasks - Employee Management</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -46,7 +49,7 @@ $result = $conn->query($sql);
             background: rgba(255,255,255,0.3);
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 30px auto;
             padding: 0 20px;
         }
@@ -97,6 +100,44 @@ $result = $conn->query($sql);
         tbody tr:hover {
             background: #f5f7fa;
         }
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .priority-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .priority-medium {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        .priority-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .status-progress {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-completed {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
         .action-btns {
             display: flex;
             gap: 10px;
@@ -129,6 +170,12 @@ $result = $conn->query($sql);
             padding: 40px;
             text-align: center;
             color: #666;
+        }
+        .task-description {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* Modal Styles */
@@ -193,18 +240,6 @@ $result = $conn->query($sql);
             font-weight: 600;
             margin-top: 15px;
         }
-        .modal-body .info-box {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 4px;
-        }
-        .modal-body .info-box p {
-            margin: 0;
-            color: #e65100;
-            font-size: 14px;
-        }
         .modal-footer {
             padding: 20px 30px;
             display: flex;
@@ -240,18 +275,18 @@ $result = $conn->query($sql);
 </head>
 <body>
     <div class="navbar">
-        <h1> Employee Management</h1>
+        <h1> Task Management</h1>
         <div class="nav-links">
             <a href="dashboard.php">Dashboard</a>
-            <a href="tasks.php">Tasks</a>
+            <a href="employees.php">Employees</a>
             <a href="logout.php">Logout</a>
         </div>
     </div>
     
     <div class="container">
         <div class="header-section">
-            <h2>All Employees</h2>
-            <a href="employee_add.php" class="btn-add">+ Add New Employee</a>
+            <h2>All Tasks</h2>
+            <a href="task_add.php" class="btn-add">+ Add New Task</a>
         </div>
         
         <div class="table-container">
@@ -259,12 +294,12 @@ $result = $conn->query($sql);
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Position</th>
-                        <th>Salary</th>
-                        <th>Hire Date</th>
+                        <th>Task Title</th>
+                        <th>Assigned To</th>
+                        <th>Description</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -273,23 +308,40 @@ $result = $conn->query($sql);
                         <?php while($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
-                                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['email']); ?></td>
-                                <td><?php echo htmlspecialchars($row['phone']); ?></td>
-                                <td><?php echo htmlspecialchars($row['position']); ?></td>
-                                <td>$<?php echo number_format($row['salary'], 2); ?></td>
-                                <td><?php echo date('M d, Y', strtotime($row['hire_date'])); ?></td>
+                                <td><strong><?php echo htmlspecialchars($row['task_title']); ?></strong></td>
+                                <td><?php echo htmlspecialchars($row['employee_name']); ?></td>
+                                <td>
+                                    <div class="task-description" title="<?php echo htmlspecialchars($row['task_description']); ?>">
+                                        <?php echo htmlspecialchars($row['task_description']); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="priority-badge priority-<?php echo strtolower($row['priority']); ?>">
+                                        <?php echo $row['priority']; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php 
+                                    $statusClass = 'status-pending';
+                                    if ($row['status'] == 'In Progress') $statusClass = 'status-progress';
+                                    if ($row['status'] == 'Completed') $statusClass = 'status-completed';
+                                    ?>
+                                    <span class="status-badge <?php echo $statusClass; ?>">
+                                        <?php echo $row['status']; ?>
+                                    </span>
+                                </td>
+                                <td><?php echo $row['deadline'] ? date('M d, Y', strtotime($row['deadline'])) : 'N/A'; ?></td>
                                 <td>
                                     <div class="action-btns">
-                                        <a href="employee_edit.php?id=<?php echo $row['id']; ?>" class="btn-edit">Edit</a>
-                                        <button type="button" class="btn-delete" onclick="openDeleteModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars(addslashes($row['name'])); ?>')">Delete</button>
+                                        <a href="task_edit.php?id=<?php echo $row['id']; ?>" class="btn-edit">Edit</a>
+                                        <button type="button" class="btn-delete" onclick="openDeleteModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars(addslashes($row['task_title'])); ?>')">Delete</button>
                                     </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="no-data">No employees found. Add your first employee!</td>
+                            <td colspan="8" class="no-data">No tasks found. Add your first task!</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -301,31 +353,27 @@ $result = $conn->query($sql);
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-               
                 <h2>Confirm Deletion</h2>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this employee?</p>
-                <p><strong id="employeeName"></strong></p>
-                <div class="info-box">
-                    <p>⚠️ All tasks assigned to this employee will also be deleted.</p>
-                </div>
+                <p>Are you sure you want to delete this task?</p>
+                <p><strong id="taskName"></strong></p>
                 <p class="warning-text">This action cannot be undone!</p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-                <form id="deleteForm" method="POST" action="employee_delete.php" style="display: inline;">
-                    <input type="hidden" name="id" id="deleteEmployeeId">
-                    <button type="submit" class="modal-btn modal-btn-confirm">Delete Employee</button>
+                <form id="deleteForm" method="POST" action="task_delete.php" style="display: inline;">
+                    <input type="hidden" name="id" id="deleteTaskId">
+                    <button type="submit" class="modal-btn modal-btn-confirm">Delete Task</button>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        function openDeleteModal(employeeId, employeeName) {
-            document.getElementById('deleteEmployeeId').value = employeeId;
-            document.getElementById('employeeName').textContent = employeeName;
+        function openDeleteModal(taskId, taskName) {
+            document.getElementById('deleteTaskId').value = taskId;
+            document.getElementById('taskName').textContent = taskName;
             document.getElementById('deleteModal').style.display = 'block';
         }
 

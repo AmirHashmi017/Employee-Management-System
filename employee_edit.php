@@ -6,11 +6,9 @@ $success = '';
 $error = '';
 $employee = null;
 
-// Get employee ID from URL
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    
-    // Fetch employee data
+
     $stmt = $conn->prepare("SELECT * FROM employees WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -25,7 +23,6 @@ if (isset($_GET['id'])) {
     $stmt->close();
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = intval($_POST['id']);
     $name = sanitize($_POST['name']);
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hire_date = sanitize($_POST['hire_date']);
     
     if (!empty($name) && !empty($email) && !empty($position)) {
-        // Check if email exists for other employees
         $check_stmt = $conn->prepare("SELECT id FROM employees WHERE email = ? AND id != ?");
         $check_stmt->bind_param("si", $email, $id);
         $check_stmt->execute();
@@ -50,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             if ($stmt->execute()) {
                 $success = "Employee updated successfully!";
-                // Refresh employee data
                 $employee['name'] = $name;
                 $employee['email'] = $email;
                 $employee['phone'] = $phone;
@@ -194,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="navbar">
-        <h1>✏️ Edit Employee</h1>
+        <h1> Edit Employee</h1>
         <a href="employees.php">← Back to Employees</a>
     </div>
     

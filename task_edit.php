@@ -6,14 +6,11 @@ $success = '';
 $error = '';
 $task = null;
 
-// Fetch all employees for dropdown
 $employees = $conn->query("SELECT id, name FROM employees ORDER BY name ASC");
 
-// Get task ID from URL
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     
-    // Fetch task data
     $stmt = $conn->prepare("SELECT * FROM tasks WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -28,7 +25,6 @@ if (isset($_GET['id'])) {
     $stmt->close();
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = intval($_POST['id']);
     $employee_id = intval($_POST['employee_id']);
@@ -44,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if ($stmt->execute()) {
             $success = "Task updated successfully!";
-            // Refresh task data
             $task['employee_id'] = $employee_id;
             $task['task_title'] = $task_title;
             $task['task_description'] = $task_description;
@@ -196,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="navbar">
-        <h1>✏️ Edit Task</h1>
+        <h1> Edit Task</h1>
         <a href="tasks.php">← Back to Tasks</a>
     </div>
     
@@ -227,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <select id="employee_id" name="employee_id" required>
                             <option value="">Select Employee</option>
                             <?php 
-                            $employees->data_seek(0); // Reset pointer
+                            $employees->data_seek(0); 
                             while($emp = $employees->fetch_assoc()): 
                             ?>
                                 <option value="<?php echo $emp['id']; ?>" <?php echo ($emp['id'] == $task['employee_id']) ? 'selected' : ''; ?>>

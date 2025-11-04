@@ -1,7 +1,10 @@
 <?php
 require_once 'config.php';
 
-session_destroy();
+if (isLoggedIn()) {
+    header("Location: dashboard.php");
+    exit();
+}
 
 header("Location: login.php");
 exit();

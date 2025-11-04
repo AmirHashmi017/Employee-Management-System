@@ -1,7 +1,6 @@
 <?php
 require_once 'config.php';
 
-// If already logged in, redirect to dashboard
 if (isLoggedIn()) {
     header("Location: dashboard.php");
     exit();
@@ -27,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: dashboard.php");
                 exit();
             } else {
-                $error = "Invalid username or password!";
+                $error = "Invalid username or password!!!!!";
             }
         } else {
-            $error = "Invalid username or password!";
+            $error = "User don't exist";
         }
         $stmt->close();
     } else {
@@ -133,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="login-container">
-        <h2>🔐 Admin Login</h2>
+        <h2> Admin Login</h2>
         <p class="subtitle">Employee Management System</p>
         
         <?php if ($error): ?>
@@ -153,12 +152,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             <button type="submit" class="btn-login">Login</button>
         </form>
-        
-        <div class="info">
-            <strong>Default Credentials:</strong><br>
-            Username: admin<br>
-            Password: admin123
-        </div>
     </div>
 </body>
 </html>

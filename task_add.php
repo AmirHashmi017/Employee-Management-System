@@ -5,7 +5,6 @@ requireLogin();
 $success = '';
 $error = '';
 
-// Fetch all employees for dropdown
 $employees = $conn->query("SELECT id, name FROM employees ORDER BY name ASC");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -169,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="navbar">
-        <h1>➕ Add New Task</h1>
+        <h1>+ Add New Task</h1>
         <a href="tasks.php">← Back to Tasks</a>
     </div>
     

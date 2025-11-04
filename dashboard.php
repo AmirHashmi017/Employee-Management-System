@@ -2,7 +2,6 @@
 require_once 'config.php';
 requireLogin();
 
-// Get statistics
 $total_employees = $conn->query("SELECT COUNT(*) as count FROM employees")->fetch_assoc()['count'];
 $total_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks")->fetch_assoc()['count'];
 $pending_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE status = 'Pending'")->fetch_assoc()['count'];
@@ -136,7 +135,7 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
 </head>
 <body>
     <div class="navbar">
-        <h1>📊 Dashboard</h1>
+        <h1> Dashboard</h1>
         <div class="user-info">
             <span>Welcome, <?php echo htmlspecialchars($_SESSION['admin_username']); ?>!</span>
             <a href="logout.php">Logout</a>
@@ -146,7 +145,7 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
     <div class="container">
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon employees">👥</div>
+                
                 <div class="stat-info">
                     <h3>Total Employees</h3>
                     <p><?php echo $total_employees; ?></p>
@@ -154,7 +153,7 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
             </div>
             
             <div class="stat-card">
-                <div class="stat-icon tasks">📋</div>
+                
                 <div class="stat-info">
                     <h3>Total Tasks</h3>
                     <p><?php echo $total_tasks; ?></p>
@@ -162,7 +161,7 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
             </div>
             
             <div class="stat-card">
-                <div class="stat-icon pending">⏳</div>
+                
                 <div class="stat-info">
                     <h3>Pending Tasks</h3>
                     <p><?php echo $pending_tasks; ?></p>
@@ -170,7 +169,7 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
             </div>
             
             <div class="stat-card">
-                <div class="stat-icon completed">✅</div>
+                
                 <div class="stat-info">
                     <h3>Completed Tasks</h3>
                     <p><?php echo $completed_tasks; ?></p>
@@ -180,13 +179,13 @@ $completed_tasks = $conn->query("SELECT COUNT(*) as count FROM tasks WHERE statu
         
         <div class="menu-grid">
             <div class="menu-card">
-                <h2>👨‍💼 Employee Management</h2>
+                <h2> Employee Management</h2>
                 <p>View, add, edit, and delete employee records. Manage employee information including contact details, position, and salary.</p>
                 <a href="employees.php" class="btn">Manage Employees</a>
             </div>
             
             <div class="menu-card">
-                <h2>📝 Task Management</h2>
+                <h2> Task Management</h2>
                 <p>Assign and track tasks for employees. Monitor task status, priorities, and deadlines to ensure project success.</p>
                 <a href="tasks.php" class="btn">Manage Tasks</a>
             </div>

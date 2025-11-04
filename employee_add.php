@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hire_date = sanitize($_POST['hire_date']);
     
     if (!empty($name) && !empty($email) && !empty($position)) {
-        // Check if email already exists
         $check_stmt = $conn->prepare("SELECT id FROM employees WHERE email = ?");
         $check_stmt->bind_param("s", $email);
         $check_stmt->execute();
@@ -170,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div class="navbar">
-        <h1>➕ Add New Employee</h1>
+        <h1> Add New Employee</h1>
         <a href="employees.php">← Back to Employees</a>
     </div>
     
